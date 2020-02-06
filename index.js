@@ -1,6 +1,6 @@
 "use strict";
 
-import "core-js/stable";
+require("core-js/stable");
 
 const wrapAnsi16 = (fn, offset) => (...args) => {
 	const code = fn(...args);
