@@ -1,4 +1,6 @@
-'use strict';
+"use strict";
+
+import "core-js/stable";
 
 const wrapAnsi16 = (fn, offset) => (...args) => {
 	const code = fn(...args);
@@ -40,17 +42,17 @@ const setLazyProperty = (object, property, get) => {
 let colorConvert;
 const makeDynamicStyles = (wrap, targetSpace, identity, isBackground) => {
 	if (colorConvert === undefined) {
-		colorConvert = require('color-convert');
+		colorConvert = require("color-convert");
 	}
 
 	const offset = isBackground ? 10 : 0;
 	const styles = {};
 
 	for (const [sourceSpace, suite] of Object.entries(colorConvert)) {
-		const name = sourceSpace === 'ansi16' ? 'ansi' : sourceSpace;
+		const name = sourceSpace === "ansi16" ? "ansi" : sourceSpace;
 		if (sourceSpace === targetSpace) {
 			styles[name] = wrap(identity, offset);
-		} else if (typeof suite === 'object') {
+		} else if (typeof suite === "object") {
 			styles[name] = wrap(suite[targetSpace], offset);
 		}
 	}
@@ -138,26 +140,38 @@ function assembleStyles() {
 		});
 	}
 
-	Object.defineProperty(styles, 'codes', {
+	Object.defineProperty(styles, "codes", {
 		value: codes,
 		enumerable: false
 	});
 
-	styles.color.close = '\u001B[39m';
-	styles.bgColor.close = '\u001B[49m';
+	styles.color.close = "\u001B[39m";
+	styles.bgColor.close = "\u001B[49m";
 
-	setLazyProperty(styles.color, 'ansi', () => makeDynamicStyles(wrapAnsi16, 'ansi16', ansi2ansi, false));
-	setLazyProperty(styles.color, 'ansi256', () => makeDynamicStyles(wrapAnsi256, 'ansi256', ansi2ansi, false));
-	setLazyProperty(styles.color, 'ansi16m', () => makeDynamicStyles(wrapAnsi16m, 'rgb', rgb2rgb, false));
-	setLazyProperty(styles.bgColor, 'ansi', () => makeDynamicStyles(wrapAnsi16, 'ansi16', ansi2ansi, true));
-	setLazyProperty(styles.bgColor, 'ansi256', () => makeDynamicStyles(wrapAnsi256, 'ansi256', ansi2ansi, true));
-	setLazyProperty(styles.bgColor, 'ansi16m', () => makeDynamicStyles(wrapAnsi16m, 'rgb', rgb2rgb, true));
+	setLazyProperty(styles.color, "ansi", () =>
+		makeDynamicStyles(wrapAnsi16, "ansi16", ansi2ansi, false)
+	);
+	setLazyProperty(styles.color, "ansi256", () =>
+		makeDynamicStyles(wrapAnsi256, "ansi256", ansi2ansi, false)
+	);
+	setLazyProperty(styles.color, "ansi16m", () =>
+		makeDynamicStyles(wrapAnsi16m, "rgb", rgb2rgb, false)
+	);
+	setLazyProperty(styles.bgColor, "ansi", () =>
+		makeDynamicStyles(wrapAnsi16, "ansi16", ansi2ansi, true)
+	);
+	setLazyProperty(styles.bgColor, "ansi256", () =>
+		makeDynamicStyles(wrapAnsi256, "ansi256", ansi2ansi, true)
+	);
+	setLazyProperty(styles.bgColor, "ansi16m", () =>
+		makeDynamicStyles(wrapAnsi16m, "rgb", rgb2rgb, true)
+	);
 
 	return styles;
 }
 
 // Make the export immutable
-Object.defineProperty(module, 'exports', {
+Object.defineProperty(module, "exports", {
 	enumerable: true,
 	get: assembleStyles
 });
